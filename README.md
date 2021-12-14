@@ -1,7 +1,7 @@
 # ProgramLegoPoweredUp
 De Lego Power+ app suckt en ik wil een handigere taal gebruiken om mijn Lego speelgoed te bedienen
 
-
+# Links
 [about powered up](https://www.lego.com/en-us/themes/powered-up/about)
 [magpi artikel](https://magpi.raspberrypi.com/articles/hack-lego-boost-with-raspberry-pi)
 [magpi download](https://magpi.raspberrypi.com/issues/80/pdf/download) --> uittreksel zit al in deze repo
