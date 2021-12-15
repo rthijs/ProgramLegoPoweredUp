@@ -54,9 +54,64 @@ Prerequisites for pylgbst:
 ```
 pip3 install pexpect
 pip3 install pygatt
+pip3 install gatt
 ```
 
-sudo pip3 install gatt  --> als we conn = get_connection_gatt(hub_mac='90:84:2B:63:0E:6F') willen gebruiken?
+I found it necesarry to install `gatt` or the first experiment below would not work.
+
+## First steps
+
+The first example on the Github page for pylgbst didn't work for me on my Raspberry Pi.
+
+```Python
+from pylgbst.hub import MoveHub
+
+hub = MoveHub()
+
+for device in hub.peripherals:
+    print(device)
+```
+
+I had to manually controll the connection the `MoveHub` constructor uses. That's also the reason I had to install `gatt`.
+
+```Python
+from pylgbst.hub import MoveHub
+from pylgbst import get_connection_gatt
+
+conn = get_connection_gatt (hub_mac='90:84:2B:63:0E:6F')
+
+hub = MoveHub(conn)
+
+for device in hub.peripherals:
+    print(device)
+```
+
+> Note that the mac address of my hub is **90:84:2B:63:0E:6F**, this will be different for other hubs.
+
+Running right after I started the hub gave me this output:
+
+```
+pi@raspberrypi:~/Documents/ProgramLegoPoweredUp $ sudo python3 experiment.py 
+Have no dedicated class for peripheral type 0x3c (TECHNIC_MEDIUM_HUB_TEMPERATURE_SENSOR) on port 0x3d
+Have no dedicated class for peripheral type 0x3c (TECHNIC_MEDIUM_HUB_TEMPERATURE_SENSOR) on port 0x60
+Have no dedicated class for peripheral type 0x39 (TECHNIC_MEDIUM_HUB_ACCELEROMETER) on port 0x61
+Have no dedicated class for peripheral type 0x3a (TECHNIC_MEDIUM_HUB_GYRO_SENSOR) on port 0x62
+Have no dedicated class for peripheral type 0x36 (TECHNIC_MEDIUM_HUB_GEST_SENSOR) on port 0x64
+Got only these devices: (EncodedMotor on port 0x0, EncodedMotor on port 0x1, None, LEDRGB on port 0x32, None, Current on port 0x3b, Voltage on port 0x3c)
+0
+1
+3
+50
+59
+60
+61
+96
+97
+98
+99
+100
+```
+
 
 
 
