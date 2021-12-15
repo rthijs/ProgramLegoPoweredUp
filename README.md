@@ -19,6 +19,16 @@ An lescan shows our Lego Technic Hub:
 
 ![lescan](.assets/lescan-output.png)
 
+Reset in case interface isn't behaving correctly:
+```
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+```
+Clicking the Bluetooth icon in the upper right corner and turning Bluetooth off and then back on again works as well.
+
+![Bluetooth icon](.assets/bluetoothicon.png)
+
+
 ## Lego BLE Wireless Protocol
 
 If you clone [this](https://github.com/LEGO/lego-ble-wireless-protocol-docs) repository (or download the zip), you can locally browse everything you need to know about how to interact with the Lego hubs. 
@@ -32,6 +42,22 @@ Let's not dive into the deep just yet. There is a [Python library](https://githu
 The author of this library, [Andrey Pokhilko](https://github.com/undera), suggests starting with looking into his [`demo.py`](https://github.com/undera/pylgbst/blob/master/examples/demo.py) file.
 
 There is also a [MagPi article](https://magpi.raspberrypi.com/articles/hack-lego-boost-with-raspberry-pi) that takes you step by step towards getting to control your Lego hub.
+
+No need to download an install it manually, pip3 can install the package just fine:
+
+```
+pip3 install pylgbst
+```
+
+Prerequisites for pylgbst:
+
+```
+pip3 install pexpect
+pip3 install pygatt
+```
+
+sudo pip3 install gatt  --> als we conn = get_connection_gatt(hub_mac='90:84:2B:63:0E:6F') willen gebruiken?
+
 
 
 # Links
