@@ -59,6 +59,14 @@ pip3 install gatt
 
 I found it necesarry to install `gatt` or the first experiment below would not work.
 
+Make python3 the default on Raspberry pi:
+
+```
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+```
+
+That's also needed to stop VSCode from complaining about "Import could not be resolved" when using pylgbst.
+
 ## First steps
 
 The first example on the Github page for pylgbst didn't work for me on my Raspberry Pi.
@@ -111,8 +119,96 @@ Got only these devices: (EncodedMotor on port 0x0, EncodedMotor on port 0x1, Non
 99
 100
 ```
+## Going Forward
+This code makes the escavator go forward at full speed for one second, then at half speed for two seconds:
 
+```Python
+from time import sleep
 
+from pylgbst import *
+from pylgbst.hub import MoveHub
+from pylgbst import get_connection_gatt
+
+log = logging.getLogger("demo")
+
+def demo_motors(hub):
+    motor_left = hub.motor_A
+    motor_right = hub.motor_B
+
+    motor_left.start_power(1.0)
+    motor_right.start_power(-1.0)
+    sleep(1)
+    motor_left.start_power(0.5)
+    motor_right.start_power(-0.5)
+    sleep(2)
+    motor_left.stop()
+    motor_right.stop()
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(relativeCreated)d\t%(levelname)s\t%(name)s\t%(message)s')
+
+    conn = get_connection_gatt (hub_mac='90:84:2B:63:0E:6F')
+    hub = MoveHub(conn)
+
+    demo_motors(hub)
+    
+```
+
+I'm happy to get that working, I could try and controll all motors on the two bricks simultaniously but connecting to two bricks at once is a new challenge. Since the goal was remote controll of the excavator let's start with some input.
+
+## Keyboard Controll
+
+Let's see if we can make the excavator speed up and slow down with the up and down arrows on the keyboard and pressing the space bar should stop the machine.
+
+### PyGame
+
+I've used PyGame before and it makes listening for keyboard events easy so lets try that. On the Raspberry Pi I didn't even have to install PyGame.
+
+```Python
+from pylgbst import get_connection_gatt
+from pylgbst.hub import MoveHub
+
+import pygame
+
+pygame.init()
+display = pygame.display.set_mode((300, 300))
+
+connection = get_connection_gatt(hub_mac='90:84:2B:63:0E:6F')
+hub = MoveHub(connection)
+
+motor_left = hub.motor_A
+motor_right = hub.motor_B
+motor_power = 0.0
+
+def set_motors_power():
+    motor_left.start_power(motor_power)
+    motor_right.start_power(motor_power * -1)
+
+def stop_motors():
+    motor_left.stop()
+    motor_right.stop()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                print("UP")
+                motor_power += 0.1
+                set_motors_power()
+            if event.key == pygame.K_DOWN:
+                print("DOWN")
+                motor_power -= 0.1
+                set_motors_power()
+            if event.key == pygame.K_SPACE:
+                print("BRAKE")
+                motor_power = 0.0
+                stop_motors()
+```
+
+This works, altough it lets the variable for the power be more than 1 and smaller than -1 but I don't care for that now. In the end I don't want to use a keyboard but an XBox controller.
 
 
 # Links
