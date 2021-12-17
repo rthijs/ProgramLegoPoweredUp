@@ -21,6 +21,11 @@ def stop_motors():
     motor_left.stop()
     motor_right.stop()
 
+def motor_callback(value):
+    print("Motor at: " + str(value))
+
+motor_left.subscribe(callback=motor_callback)
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

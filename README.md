@@ -211,6 +211,19 @@ while True:
 This works, altough it lets the variable for the power be more than 1 and smaller than -1 but I don't care for that now. In the end I don't want to use a keyboard but an XBox controller.
 
 
+## Callbacks
+
+By using a callback we can be updated live on the position of the motor:
+
+```Python
+def motor_callback(value):
+    print("Motor at: " + str(value))
+
+motor_left.subscribe(callback=motor_callback)
+```
+
+This can come in handy for the excavator arm where there are max and min positions. We should manually controll the extension of the lineair actuators and store the motor's position for minimum and maximum extension to prevent damage to the Lego set.
+
 # Links
  - [about powered up](https://www.lego.com/en-us/themes/powered-up/about)
  - [magpi artikel](https://magpi.raspberrypi.com/articles/hack-lego-boost-with-raspberry-pi)
