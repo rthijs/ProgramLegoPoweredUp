@@ -2,11 +2,11 @@
 
 I don't like controlling my Liebherr 9800 model with the Lego Power+ Android app. Controls on a touch screen just plain suck. Also I'd like another programming language than the graphical blocks Lego uses.
 
-Eventually I hope to use the [Raspberry Pi Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/) in a custom enclosure with fysical knobs to controll my Lego sets.
+Eventually I hope to use the [Raspberry Pi Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/) in a custom enclosure with physical knobs to control my Lego sets.
 
 The development I'll do on a Raspberry Pi 4 with 4 gigs of ram. The low power Zero does not make a great development computer.
 
-The Lego Powered Up brick connects with Bluetooth Low Engergy (BLE) and this is available for most Raspberry Pi's.
+The Lego Powered Up brick connects with Bluetooth Low Energy (BLE) and this is available for most Raspberry Pi's.
 
 ## Bluetooth Low Energy
 According to `apt search` the `bluez` package for Bluetooth support is at version 5.50-1.2. To install the latest version, currently 5.62, I followed instructions from [here](https://www.argenox.com/library/bluetooth-low-energy/using-raspberry-pi-ble/). 
@@ -57,7 +57,7 @@ pip3 install pygatt
 pip3 install gatt
 ```
 
-I found it necesarry to install `gatt` or the first experiment below would not work.
+I found it necessary to install `gatt` or the first experiment below would not work.
 
 Make python3 the default on Raspberry pi:
 
@@ -80,7 +80,7 @@ for device in hub.peripherals:
     print(device)
 ```
 
-I had to manually controll the connection the `MoveHub` constructor uses. That's also the reason I had to install `gatt`.
+I had to manually control the connection the `MoveHub` constructor uses. That's also the reason I had to install `gatt`.
 
 ```Python
 from pylgbst.hub import MoveHub
@@ -120,7 +120,7 @@ Got only these devices: (EncodedMotor on port 0x0, EncodedMotor on port 0x1, Non
 100
 ```
 ## Going Forward
-This code makes the escavator go forward at full speed for one second, then at half speed for two seconds:
+This code makes the excavator go forward at full speed for one second, then at half speed for two seconds:
 
 ```Python
 from time import sleep
@@ -154,9 +154,9 @@ if __name__ == '__main__':
     
 ```
 
-I'm happy to get that working, I could try and controll all motors on the two bricks simultaniously but connecting to two bricks at once is a new challenge. Since the goal was remote controll of the excavator let's start with some input.
+I'm happy to get that working, I could try and control all motors on the two bricks simultaneously but connecting to two bricks at once is a new challenge. Since the goal was remote control of the excavator let's start with some input.
 
-## Keyboard Controll
+## Keyboard Control
 
 Let's see if we can make the excavator speed up and slow down with the up and down arrows on the keyboard and pressing the space bar should stop the machine.
 
@@ -208,7 +208,7 @@ while True:
                 stop_motors()
 ```
 
-This works, altough it lets the variable for the power be more than 1 and smaller than -1 but I don't care for that now. In the end I don't want to use a keyboard but an XBox controller.
+This works, although it lets the variable for the power be more than 1 and smaller than -1 but I don't care for that now. In the end I don't want to use a keyboard but an XBox controller.
 
 
 ## Callbacks
@@ -265,7 +265,7 @@ Motor at: 153
 ...
 ```
 
-This can come in handy for the excavator arm where there are max and min positions. We should manually controll the extension of the lineair actuators and store the motor's position for minimum and maximum extension to prevent damage to the Lego set.
+This can come in handy for the excavator arm where there are max and min positions. We should manually control the extension of the linear actuators and store the motor's position for minimum and maximum extension to prevent damage to the Lego set.
 
 ## A model for the excavator
 
