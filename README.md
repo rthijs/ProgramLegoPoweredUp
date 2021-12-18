@@ -222,7 +222,127 @@ def motor_callback(value):
 motor_left.subscribe(callback=motor_callback)
 ```
 
+Console output:
+
+```
+pi@raspberrypi:~/Documents/ProgramLegoPoweredUp $ python3 PyGameKeyboardInput.py 
+pygame 1.9.4.post1
+Hello from the pygame community. https://www.pygame.org/contribute.html
+Have no dedicated class for peripheral type 0x3c (TECHNIC_MEDIUM_HUB_TEMPERATURE_SENSOR) on port 0x3d
+Have no dedicated class for peripheral type 0x3c (TECHNIC_MEDIUM_HUB_TEMPERATURE_SENSOR) on port 0x60
+Have no dedicated class for peripheral type 0x39 (TECHNIC_MEDIUM_HUB_ACCELEROMETER) on port 0x61
+Have no dedicated class for peripheral type 0x3a (TECHNIC_MEDIUM_HUB_GYRO_SENSOR) on port 0x62
+Have no dedicated class for peripheral type 0x36 (TECHNIC_MEDIUM_HUB_GEST_SENSOR) on port 0x64
+Got only these devices: (EncodedMotor on port 0x0, EncodedMotor on port 0x1, None, LEDRGB on port 0x32, None, Current on port 0x3b, Voltage on port 0x3c)
+Motor at: 0
+Motor at: -1
+Motor at: -2
+UP
+Motor at: -1
+Motor at: 0
+Motor at: 1
+Motor at: 6
+Motor at: 11
+Motor at: 16
+Motor at: 21
+Motor at: 26
+Motor at: 32
+Motor at: 37
+Motor at: 43
+Motor at: 49
+Motor at: 55
+Motor at: 61
+UP
+Motor at: 67
+Motor at: 73
+Motor at: 81
+Motor at: 92
+Motor at: 105
+UP
+Motor at: 118
+Motor at: 133
+Motor at: 153
+...
+```
+
 This can come in handy for the excavator arm where there are max and min positions. We should manually controll the extension of the lineair actuators and store the motor's position for minimum and maximum extension to prevent damage to the Lego set.
+
+## A model for the excavator
+
+Let's do some Object Oriented Programming and create a model for the excavator. Since I'm still in the proof of concept phase I'll just model the 2 motors for the tracks.
+
+I've made this model for the Liebherr, it has a few methods that allow us to drive forward and backward with a speed of our choosing. I also have some variables for motor position but I don't use them yet.
+
+```Python
+class Liebherr9800:
+
+    def __init__(self, bottomHub):
+        self._motor_left = bottomHub.motor_A
+        self._motor_right = bottomHub.motor_B
+        self._motor_left_position = 0
+        self._motor_right_position = 0
+        self._motor_left_speed = 0.0     # positive values for forward
+        self._motor_right_speed = 0.0    # negative values for forward
+
+    @property
+    def motor_left_speed(self):
+        return self._motor_left_speed
+
+    @property
+    def motor_right_speed(self):
+        return self._motor_right_speed
+
+    @motor_left_speed.setter
+    def motor_left_speed(self, value):
+        self._motor_left_speed = self.get_validated_speed_value(value)
+        self._motor_left.start_power(self._motor_left_speed)
+
+    @motor_right_speed.setter
+    def motor_right_speed(self, value):
+        self._motor_right_speed = self.get_validated_speed_value(value)
+        self._motor_right.start_power(self._motor_right_speed)
+
+    def get_validated_speed_value(self, value):
+        if (value < -1):
+            return -1 #motor speed can't be lower than -1.
+        elif (value > 1) :
+            return 1 #motor speed can't be higher than 1.
+        else:
+            return value
+
+    def halt(self):
+        self._motor_left.stop()
+        self._motor_right.stop()
+        self._motor_left_speed = 0.0
+        self._motor_right_speed = 0.0
+
+    def drive(self, speed=1):
+        self.motor_left_speed = speed
+        self.motor_right_speed = speed * -1
+```
+
+Here I use this class in a script that makes the excavator drive forward at full speed for 1 second, then drives backward for 2 seconds at half power.
+
+```Python
+from pylgbst import get_connection_gatt
+from pylgbst.hub import MoveHub
+from liebherr_9800 import Liebherr9800
+from time import sleep
+
+bottomHubMacAddress = '90:84:2B:63:0E:6F'
+bottomHubConnection = get_connection_gatt(hub_mac=bottomHubMacAddress)
+bottomHub = MoveHub(bottomHubConnection)
+
+excavator = Liebherr9800(bottomHub)
+
+excavator.drive()
+sleep(1)
+excavator.drive(speed=-0.5)
+sleep(2)
+excavator.halt()
+```
+
+If you are following along make sure to replace the mac address.
 
 # Links
  - [about powered up](https://www.lego.com/en-us/themes/powered-up/about)
