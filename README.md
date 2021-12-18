@@ -344,6 +344,151 @@ excavator.halt()
 
 If you are following along make sure to replace the mac address.
 
+## Xbox 360 Controler
+
+There are a few things left before I can go from proof of concept to fully working solution. 
+
+ - Controller support
+ - Connect multiple hubs
+ - Use motor positions to prevent overextending certain functions
+
+And a few things I'd like to add:
+
+ - Control one model with multiple controllers
+ - Control two models with a controller each
+ - Control two models with a single controller
+
+As the title suggests I'll go for controller support first. Luckily I have another personal project where I aim to make adding controller support to anything as easy as possible. The Github page is [here](https://github.com/rthijs/R2L.XboxC). Now is a good time to see if my work on that is any good :)
+
+### XboxC
+
+I'll follow my own instructions so first is to download the latest version from [here](https://github.com/rthijs/R2L.XboxC/blob/master/readmeResources/XboxC-latest.jar).
+
+This is a Java application so we'll need to install Java:
+
+```
+sudo apt install default-jdk
+```
+
+```Shell
+pi@raspberrypi:~ $ java -version
+openjdk version "11.0.12" 2021-07-20
+OpenJDK Runtime Environment (build 11.0.12+7-post-Raspbian-2deb10u1)
+OpenJDK Server VM (build 11.0.12+7-post-Raspbian-2deb10u1, mixed mode)
+pi@raspberrypi:~ $ 
+```
+
+Now connect a controller to the Raspberry Pi and run the jar.
+
+```Shell
+java -jar XboxC-latest.jar
+```
+
+We get a grey scale picture of a controller and lots of output when we push some buttons:
+
+```
+...
+Not connected to server, using dummy output.
+{"controllerIndex":0,"item":"BUTTON_B","value":0.0}
+Not connected to server, using dummy output.
+{"controllerIndex":0,"item":"BUTTON_Y","value":0.0}
+Not connected to server, using dummy output.
+{"controllerIndex":0,"item":"AXIS_L_STICK_HORIZONTAL_AXIS","value":0.09521775}
+Not connected to server, using dummy output.
+{"controllerIndex":0,"item":"AXIS_L_STICK_VERTICAL_AXIS","value":-0.24246956}
+Not connected to server, using dummy output.
+{"controllerIndex":0,"item":"AXIS_L_STICK_HORIZONTAL_AXIS","value":0.4753563}
+...
+```
+
+The `Not connected to server...` message indicates we need to run a socket server to receive the messages. Let's just use the example code from the XboxC Github page.
+
+```Python
+import socket
+import json
+
+def xboxc_server():
+    host = "127.0.0.1"
+    port = 8099
+
+    server_socket = socket.socket()
+    server_socket.bind((host, port))
+
+    server_socket.listen(1) #we only listen to one client
+    conn, address = server_socket.accept()  # accept new connection
+    print("Connection from: " + str(address))
+
+    while True:
+        data = conn.recv(128).decode() #message max size 128 bytes
+        print(str(data))
+        
+        input_event = json.loads(data)
+        
+        index = input_event['controllerIndex']
+        item = input_event['item']
+        value = input_event['value']
+
+        print(str(index))
+        print(str(item))
+        print(str(value))
+        print('--------------------------')
+
+
+    conn.close()
+
+
+if __name__ == '__main__':
+    xboxc_server()
+```
+
+We need to start the server before launching the XboxC jar. Doing so should give us output like below from the server script.
+
+```
+Connection from: ('127.0.0.1', 47712)
+{"controllerIndex":0,"item":"BUTTON_A","value":1.0}
+
+0
+BUTTON_A
+1.0
+--------------------------
+{"controllerIndex":0,"item":"BUTTON_A","value":0.0}
+
+0
+BUTTON_A
+0.0
+--------------------------
+{"controllerIndex":0,"item":"AXIS_R_STICK_HORIZONTAL_AXIS","value":0.11938841}
+
+0
+AXIS_R_STICK_HORIZONTAL_AXIS
+0.11938841
+--------------------------
+{"controllerIndex":0,"item":"AXIS_R_STICK_HORIZONTAL_AXIS","value":0.2102115}
+
+0
+AXIS_R_STICK_HORIZONTAL_AXIS
+0.2102115
+--------------------------
+{"controllerIndex":0,"item":"AXIS_R_STICK_HORIZONTAL_AXIS","value":0.5009919}
+
+0
+AXIS_R_STICK_HORIZONTAL_AXIS
+0.5009919
+--------------------------
+{"controllerIndex":0,"item":"AXIS_R_STICK_HORIZONTAL_AXIS","value":0.64674824}
+
+0
+AXIS_R_STICK_HORIZONTAL_AXIS
+0.64674824
+```
+Index is the controller number, we only have one so this is 0, item contains a string indicating the button or joystick used and then finally the value for that item.
+
+Whe have all we need now, time to mash it together and control the excavator from a real controller!
+
+## Wiring it all up
+
+Let's wire all the bits together and finally use physical controls for the Lego Liebherr 9800. For now we will be limited to controlling the two tracks but we'll have a solid base to build from.
+
 # Links
  - [about powered up](https://www.lego.com/en-us/themes/powered-up/about)
  - [magpi artikel](https://magpi.raspberrypi.com/articles/hack-lego-boost-with-raspberry-pi)
