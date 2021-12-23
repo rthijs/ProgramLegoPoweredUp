@@ -489,6 +489,13 @@ Whe have all we need now, time to mash it together and control the excavator fro
 
 Let's wire all the bits together and finally use physical controls for the Lego Liebherr 9800. For now we will be limited to controlling the two tracks but we'll have a solid base to build from.
 
+
+******
+launch a jar from python:
+https://www.datasciencelearner.com/how-to-call-jar-file-using-python/
+
+******
+
 # Links
  - [about powered up](https://www.lego.com/en-us/themes/powered-up/about)
  - [magpi artikel](https://magpi.raspberrypi.com/articles/hack-lego-boost-with-raspberry-pi)
